@@ -25,6 +25,8 @@ hoja_1(char *host, char *operacion, registro alta_1_arg)
 	if (result_1 == (char **) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
+
+	printf("Resultado recibido desde el servidor: %s\n", *result_1);
 #ifndef	DEBUG
 	clnt_destroy (clnt);
 #endif	 /* DEBUG */
@@ -35,7 +37,7 @@ int
 main (int argc, char *argv[])
 {
 	char *host;
-	char *operacion;
+	char *operation;
 	registro reg;
 
 	if (argc < 5) {

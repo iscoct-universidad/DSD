@@ -1,6 +1,9 @@
 #include "hoja.h"
 #include <string.h>
 
+registro *baseDeDatos;
+int tam = 0;
+
 char **
 alta_1_svc(registro *argp, struct svc_req *rqstp)
 {
@@ -11,7 +14,7 @@ alta_1_svc(registro *argp, struct svc_req *rqstp)
 	int i = 0;
 
 	while(! encontrado && i < tam) {
-		if(strcmp(argp -> ip, baseDeDatos[i]))
+		if(strcmp(argp -> ip, baseDeDatos[i].ip))
 			encontrado = 1;
 		else
 			++i;
@@ -27,8 +30,12 @@ alta_1_svc(registro *argp, struct svc_req *rqstp)
 		baseDeDatos[tam - 1].nombre = argp -> nombre;
 		
 		result = "Se ha insertado con éxito la tupla";
-	} else
+	} else 
 		result = "La ip dada ya se encuentra en la base de datos";
 
+	printf("Nombre recibido: %s\n", argp -> nombre);
+	printf("Ip recibida: %s\n", argp -> ip);
+	printf("%s\n", result);
+	
 	return &result;
 }

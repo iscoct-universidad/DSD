@@ -8,9 +8,6 @@
 
 #include <rpc/rpc.h>
 
-extern registro *baseDeDatos;
-extern int tam = 0;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
