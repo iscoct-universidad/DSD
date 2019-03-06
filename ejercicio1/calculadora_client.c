@@ -8,14 +8,13 @@
 
 
 void
-calculadora_1(char *host)
+calculadora_1(char *host, operacionBinaria operacion_1_arg)
 {
 	CLIENT *clnt;
 	int  *result_1;
-	operacionBinaria  operacion_1_arg;
 
 #ifndef	DEBUG
-	clnt = clnt_create (host, CALCULADORA, PRIMERA, "udp");
+	clnt = clnt_create (host, CALCULADORA, PRIMERA, "tcp");
 	if (clnt == NULL) {
 		clnt_pcreateerror (host);
 		exit (1);
@@ -29,6 +28,8 @@ calculadora_1(char *host)
 #ifndef	DEBUG
 	clnt_destroy (clnt);
 #endif	 /* DEBUG */
+
+	printf("Resultado devuelto: %i\n", *result_1);
 }
 
 
@@ -36,12 +37,18 @@ int
 main (int argc, char *argv[])
 {
 	char *host;
+	operacionBinaria op;
 
-	if (argc < 2) {
+	if (argc < 5) {
 		printf ("usage: %s server_host\n", argv[0]);
 		exit (1);
 	}
+
 	host = argv[1];
-	calculadora_1 (host);
+	op -> entero1 = atoi(argv[2]);
+	op -> entero2 = atoi(argv[4]);
+	op -> op = argv[3];
+
+	calculadora_1 (host, op);
 exit (0);
 }

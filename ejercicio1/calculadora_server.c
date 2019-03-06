@@ -11,6 +11,29 @@ operacion_1_svc(operacionBinaria *argp, struct svc_req *rqstp)
 {
 	static int  result;
 	
+	printf("Entero 1: %i\n", argp -> entero1);
+	printf("Entero 2: %i\n", argp -> entero2);
+	printf("Operación: %s\n", argp -> op);
+
+	switch (argp -> op[0])
+	{
+		case '+'
+			result = argp -> entero1 + entero2;
+			break;
+		case '-':
+			result = argp -> entero1 - entero2;
+			break;
+		case '*':
+			result = argp -> entero1 * entero2;
+			break;
+		case '/':
+			result = argp -> entero1 / entero2;
+			break;
+		default:
+			break;
+	}
+
+	printf("Este es el resultado que se devuelve de parte del servidor: %i\n", result);
 
 	return &result;
 }
