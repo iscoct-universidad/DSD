@@ -11,4 +11,4 @@ program CALCULADORA {
     version PRIMERA {
         int OPERACION (operacionBinaria) = 1;
     } = 1;
-} = 0x200000001;
+} = 0x20000001;
