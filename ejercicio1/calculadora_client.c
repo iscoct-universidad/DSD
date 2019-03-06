@@ -40,14 +40,14 @@ main (int argc, char *argv[])
 	operacionBinaria op;
 
 	if (argc < 5) {
-		printf ("usage: %s server_host\n", argv[0]);
+		printf ("usage: %s server_host entero1 operacion entero2\n", argv[0]);
 		exit (1);
 	}
 
 	host = argv[1];
-	op -> entero1 = atoi(argv[2]);
-	op -> entero2 = atoi(argv[4]);
-	op -> op = argv[3];
+	op.entero1 = atoi(argv[2]);
+	op.entero2 = atoi(argv[4]);
+	op.op = argv[3];
 
 	calculadora_1 (host, op);
 exit (0);

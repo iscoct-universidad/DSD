@@ -17,19 +17,21 @@ operacion_1_svc(operacionBinaria *argp, struct svc_req *rqstp)
 
 	switch (argp -> op[0])
 	{
-		case '+'
-			result = argp -> entero1 + entero2;
+		case '+':
+			result = argp -> entero1 + argp -> entero2;
 			break;
 		case '-':
-			result = argp -> entero1 - entero2;
+			result = argp -> entero1 - argp -> entero2;
 			break;
 		case '*':
-			result = argp -> entero1 * entero2;
+			result = argp -> entero1 * argp -> entero2;
 			break;
 		case '/':
-			result = argp -> entero1 / entero2;
+			result = argp -> entero1 / argp -> entero2;
 			break;
 		default:
+			printf("Han introducido una operación no válida\n");
+			result = 0;
 			break;
 	}
 
