@@ -8,20 +8,23 @@ int main (int argc, char **argv) {
     char *message;
 
     if(argc != 3) {
-        fpritnf(stderr, "uso: %s maquina mensaje\n", argv[0]);
+        fprintf(stderr, "uso: %s maquina mensaje\n", argv[0]);
         exit(1);
     }
 
     server = argv[1];
     message = argv[2];
 
-    clnt = clnt_create(server, MESSAGEPROG, PRINTMESSAGEVERS, "visible");
+    clnt = clnt_create(server, MESSAGEPROG, PRINTMESSAGEVERS, "tcp");
 
     if(clnt == (CLIENT *) NULL) {
         clnt_pcreateerror(server);
         exit(1);
     }
 
+	printf("Este es el mensaje que se enviará: %s\n", message);
+	printf("Este es el servidor al que se dirige la llamada: %s\n", server);
+	
     result = printmessage_1(&message, clnt);
 
     if(result == (int *) NULL) {

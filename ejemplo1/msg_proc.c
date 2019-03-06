@@ -1,21 +1,15 @@
 #include <stdio.h>
 #include "msg.h"
 
-int *printmessage_1(char **msg, struct svc_req *req) {
+int *printmessage_1_svc(char **msg, struct svc_req *req) {
     static int result;
-    FILE *f;
+    
+	printf ("Se ha recibido una nueva petición\n");
+	printf("El primer argumento es el siguiente: %s\n", msg[0]);
 
-    f = fopen("/dev/console", "w");
-
-    if(f == (FILE *) NULL) {
-        result = 0;
-
-        return (&result);
-    }
-
-    fprintf(f, "%s\n", *msg);
-    fclose(f);
     result = 1;
+    
+    printf("Result = %i\n", result);
     
     return (&result);
 }
