@@ -8,11 +8,10 @@
 
 
 void
-hoja_1(char *host)
+hoja_1(char *host, char *operacion, registro alta_1_arg)
 {
 	CLIENT *clnt;
 	char * *result_1;
-	registro  alta_1_arg;
 
 #ifndef	DEBUG
 	clnt = clnt_create (host, HOJA, PRIMERA, "udp");
@@ -36,12 +35,19 @@ int
 main (int argc, char *argv[])
 {
 	char *host;
+	char *operacion;
+	registro reg;
 
-	if (argc < 2) {
-		printf ("usage: %s server_host\n", argv[0]);
+	if (argc < 5) {
+		printf ("usage: %s server_host operation name ip\n", argv[0]);
 		exit (1);
 	}
+
 	host = argv[1];
-	hoja_1 (host);
+	operation = argv[2];
+	reg.nombre = argv[3];
+	reg.ip = argv [4];
+
+	hoja_1 (host, operation, reg);
 exit (0);
 }
