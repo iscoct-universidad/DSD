@@ -1,0 +1,5 @@
+1. En msg_proc.c hay que poner int *printmessage_1_svc en vez de simplemente int *printmessage_1.
+
+2. Tenía problemas para poder abrir la consola al hacer /dev/console, por lo que en vez de abrir la consola e imprimir así, directamente hago un printf con el mensaje enviado.
+
+3. Si ejecutamos el servidor, en los apuntes pone que se ejecuta en segundo plano siempre, pero realmente se ejecuta en foreground.
