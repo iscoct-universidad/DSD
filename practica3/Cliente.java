@@ -1,10 +1,10 @@
-public class Cliente implements InterfazCliente {
-	private int estado;
+public class Cliente implements InterfazClientePrivada {
+	private boolean donado;
 	private float cuantiaDon;
 	private final String nombreCuenta;
 
 	Cliente (String nombreCuenta) {
-		this.estado = 1;
+		this.donado = false;
 		this.cuantiaDon = 0;
 		this.nombreCuenta = nombreCuenta;
 	}
@@ -17,16 +17,13 @@ public class Cliente implements InterfazCliente {
 		return this.nombreCuenta;
 	}
 	
-	public void donar (float cuantia) {
+	synchronized public void donar (float cuantia) {
 		cuantiaDon += cuantia;		// Cuantía donada por el cliente
+		donado = true;
 	}
 	
-	public int getEstado() {
-		return this.estado;
-	}
-	
-	public void setEstado(int estado) {
-		this.estado = estado;
+	public boolean getDonado() {
+		return this.donado;
 	}
 	
 	// 2 clientes son iguales si tienen el mismo nombre de cuenta

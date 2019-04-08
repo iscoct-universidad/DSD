@@ -5,37 +5,62 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class ProgramaServidor {
 	public static void main (String [] args) {
-		if(args.length != 2) {
-			System.err.println("java <programa> <puertoRegistry> <nombreServidor>");
-		} else {
+		if(args.length > 2) {
 			if (System.getSecurityManager () == null)
 				System.setSecurityManager (new SecurityManager ());
 			
 			try {
-				String nombreServidor = args[1];
-				int numRegistry = Integer.parseInt(args[0]);
-				Registry registry = LocateRegistry.getRegistry (numRegistry);
-				InterfazServidor servidor = new Servidor(registry);
+				String hostRegistry = args[0];
+				int puertoRegistry = Integer.parseInt(args[1]);
+				String nombreServidor = args[2];
+				
+				// Tomamos el registry con el host y puerto indicados
+				
+				Registry registry = LocateRegistry.getRegistry (hostRegistry, puertoRegistry);
+				
+				// Creamos el servidor Broker
+				
+				InterfazServidor servidor = new Servidor(nombreServidor, registry);
 				
 				System.out.println("Exportamos objeto y tomamos registry");
+
+				/*
+					Exportamos el servidor Broker a un puerto que el SO
+					asignará dinámicamente (por eso ponemos el 0)
+				*/
 				
 				InterfazServidor stubServidor = (InterfazServidor) UnicastRemoteObject.exportObject (servidor, 0);
 				
 				System.out.println("Le damos nombre al servidor");
 				System.out.println("Nombre servidor: " + nombreServidor);
-				System.out.println("Puerto rmiregistry: " + args[0]);
+
+				/*
+					Enlazamos el nombre del servidor que le hemos asignado
+					al stub del servidor
+				*/
+				
 				registry.rebind (nombreServidor, stubServidor);
 				
-				String nombreBroker = "Broker";
-				InterfazBroker broker = (InterfazBroker) registry.lookup(nombreBroker);
-				
-				broker.addServidor(servidor);
+				if(args.length == 6) {
+					String hostRegistryRegistrarse = args[3];
+					int puertoRegistryRegistrarse = Integer.parseInt(args[4]);
+					String nombreServidorRegistrarse = args[5];
+					
+					System.out.println("Buscando al servidor " + nombreServidorRegistrarse + " para registrarse en él");
+					
+					Registry registryRegistrarse = LocateRegistry.getRegistry(hostRegistryRegistrarse, puertoRegistryRegistrarse);
+					InterfazBroker brokerRegistrarse = (InterfazBroker) registryRegistrarse.lookup(nombreServidorRegistrarse);
+					
+					brokerRegistrarse.addServidor(servidor);
+				}
 				
 				System.out.println ("Ejecutando el programa servidor");
 			} catch (Exception e) {
 				System.err.println ("Fallo al ejecutar el programa servidor: ");
 				e.printStackTrace ();
 			}
+		} else {
+			System.err.println("java <programa> <hostRegistry> <puertoRegistry> <nombreServidor> [<nombreServidorASuscribirse>]");
 		}
 	}
 }
