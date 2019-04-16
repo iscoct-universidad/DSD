@@ -10,10 +10,35 @@
 	<body>
 		<main>
 			<form id="formulario" action="./actualizarEstado" method="post">
-				Luminosidad <input type="text" name="temperatura">
+				Luminosidad <input type="text" name="luminosidad">
 				Temperatura <input type="text" name="temperatura">
 				<input type="submit" value="Enviar">
 			</form>
+			
+			<div>
+				<p>Persiana: <span id="persiana"></span></p>
+				<p>Aire acondicionado: <span id="aireAcondicionado"></span></p>
+			</div>
+			
+			<a href="./">Volver</a>
 		</main>
+		<script src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript">
+			let socket = io();
+			
+			socket.emit('infoActuadores');
+			socket.on('infoActuadores', function(persiana, aire) {
+				console.log("Se ha recibido un mensaje tipo infoSensores");
+				actualizarActuadores(persiana, aire);
+			});
+			
+			function actualizarActuadores(persiana, aire) {
+				console.log("Acción persiana recibida: " + persiana);
+				console.log("Acción aire recibido: " + aire);
+				
+				document.getElementById("persiana").innerHTML = persiana;
+				document.getElementById("aireAcondicionado").innerHTML = aire;
+			}
+		</script>
 	</body>
 </html>

@@ -1,3 +1,6 @@
+import Luminosidad from './luminosidad';
+import Temperatura from './temperatura';
+
 export default class Agente {
 	private MAX_LUMINOSIDAD: number;
 	private MIN_LUMINOSIDAD: number;
@@ -27,13 +30,13 @@ export default class Agente {
 	public removeMotorPersiana(motor: MotorPersiana): void {
 		const pos: number = this.getMotoresPersiana().indexOf(motor);
 		
-		this.getMotoresPersiana().splice(pos, pos + 1);
+		this.getMotoresPersiana().splice(pos, 1);
 	}
 	
 	public removeAireAcondicionado(aire: AireAcondicionado): void {
 		const pos: number = this.getAiresAcondicionados().indexOf(aire);
 		
-		this.getAiresAcondicionados().splice(pos, pos + 1);
+		this.getAiresAcondicionados().splice(pos, 1);
 	}
 	
 	public getMotoresPersiana(): Array<MotorPersiana> {
@@ -46,13 +49,13 @@ export default class Agente {
 	
 	public realizarAcciones(sensor: Sensor): void {
 		if(sensor instanceof Luminosidad) {
-			for(let motor in this.getMotoresPersiana())
+			for(let motor of this.getMotoresPersiana())
 				if(sensor.getEstado() > this.getMaxLuminosidad())
 					motor.setAccion(true);
 		} else if(sensor instanceof Temperatura) {
-			for(let aire in this.getAiresAcondicionados())
+			for(let aire of this.getAiresAcondicionados())
 				if(sensor.getEstado() > this.getMaxTemperatura())
-					motor.setAccion(true);
+					aire.setAccion(true);
 		}
 	}
 	

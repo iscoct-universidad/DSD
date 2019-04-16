@@ -1,5 +1,7 @@
 "use strict";
 exports.__esModule = true;
+var luminosidad_1 = require("./luminosidad");
+var temperatura_1 = require("./temperatura");
 var Agente = /** @class */ (function () {
     function Agente() {
         this.MAX_LUMINOSIDAD = 50;
@@ -17,11 +19,11 @@ var Agente = /** @class */ (function () {
     };
     Agente.prototype.removeMotorPersiana = function (motor) {
         var pos = this.getMotoresPersiana().indexOf(motor);
-        this.getMotoresPersiana().splice(pos, pos + 1);
+        this.getMotoresPersiana().splice(pos, 1);
     };
     Agente.prototype.removeAireAcondicionado = function (aire) {
         var pos = this.getAiresAcondicionados().indexOf(aire);
-        this.getAiresAcondicionados().splice(pos, pos + 1);
+        this.getAiresAcondicionados().splice(pos, 1);
     };
     Agente.prototype.getMotoresPersiana = function () {
         return this.motoresPersiana;
@@ -30,15 +32,19 @@ var Agente = /** @class */ (function () {
         return this.airesAcondicionados;
     };
     Agente.prototype.realizarAcciones = function (sensor) {
-        if (sensor instanceof Luminosidad) {
-            for (var motor in this.getMotoresPersiana())
+        if (sensor instanceof luminosidad_1["default"]) {
+            for (var _i = 0, _a = this.getMotoresPersiana(); _i < _a.length; _i++) {
+                var motor = _a[_i];
                 if (sensor.getEstado() > this.getMaxLuminosidad())
                     motor.setAccion(true);
+            }
         }
-        else if (sensor instanceof Temperatura) {
-            for (var aire in this.getAiresAcondicionados())
+        else if (sensor instanceof temperatura_1["default"]) {
+            for (var _b = 0, _c = this.getAiresAcondicionados(); _b < _c.length; _b++) {
+                var aire = _c[_b];
                 if (sensor.getEstado() > this.getMaxTemperatura())
-                    motor.setAccion(true);
+                    aire.setAccion(true);
+            }
         }
     };
     Agente.prototype.getMaxLuminosidad = function () {
