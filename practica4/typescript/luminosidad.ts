@@ -1,17 +1,17 @@
 import Sensor from './sensor';
 
 export default class Luminosidad implements Sensor {
-	private luminosidad: float;
+	private luminosidad: number;
 	
-	constructor(luminosidad: float) {
+	constructor(luminosidad: number) {
 		this.luminosidad = luminosidad;
 	}
 	
-	actualizarEstado(estado: float): void {
+	actualizarEstado(estado: number): void {
 		this.luminosidad = estado;
 	}
 	
-	getEstado(): float {
+	getEstado(): number {
 		return this.luminosidad;
 	}
 }

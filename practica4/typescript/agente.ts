@@ -1,5 +1,8 @@
 import Luminosidad from './luminosidad';
 import Temperatura from './temperatura';
+import MotorPersiana from './motorPersiana';
+import AireAcondicionado from './aireAcondicionado';
+import Sensor from './sensor';
 
 export default class Agente {
 	private MAX_LUMINOSIDAD: number;

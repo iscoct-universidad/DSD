@@ -1,17 +1,17 @@
 import Sensor from './sensor';
 
 export default class Temperatura implements Sensor {
-	private temperatura: float;
+	private temperatura: number;
 	
-	constructor(temperatura: float) {
+	constructor(temperatura: number) {
 		this.temperatura = temperatura;
 	}
 	
-	actualizarEstado(estado: float): void {
+	actualizarEstado(estado: number): void {
 		this.temperatura = estado;
 	}
 	
-	getEstado(): float {
+	getEstado(): number {
 		return this.temperatura;
 	}
 }
