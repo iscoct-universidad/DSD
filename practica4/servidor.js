@@ -1,5 +1,10 @@
 "use strict"
 
+/*
+	Se usa el framework express de nodejs para que sea más legible
+	el código a la hora de recibir las peticiones al servidor
+*/
+
 var app = require('express')();
 var fs = require('fs');
 var http = require('http').Server(app);
@@ -8,23 +13,40 @@ var MongoClient = require('mongodb').MongoClient;
 var MongoServer = require('mongodb').Server;
 const bodyParser = require('body-parser');
 
+/*
+	Para tomar que los valores que lleguen desde una petición HTTP
+	con método POST se pueda acceder de manera, <respuesta>.body.<parametroPost>
+*/
+
 app.use(bodyParser.urlencoded({ extended: false }));
+
+/*
+	Función que devuelve el fichero actualizarEstado.html
+*/
 
 function devolverActualizarEstado(req, res) {
 	fs.readFile('./actualizarEstado.html', (err, data) => {
 		if(err)
 			throw err;
 		
+		// Aquí se produce la modificación de la cabecera y el resultado de la petición
+		
 		res.setHeader('Content-Type', 'text/html');
 		res.end(data);
 	});
 }
+
+/*
+	Función que devuelve el fichero index.html
+*/
 
 function devolverIndex(req, res) {
 	fs.readFile('./index.html', (err, data) => {
 		if(err)
 			throw err;
 			
+		// Igual que la función anterior
+		
 		res.setHeader('Content-Type', 'text/html');
 		res.end(data);
 	});
@@ -37,28 +59,54 @@ function devolverIndex(req, res) {
 	4. Creo la colección
 */
 
+// Creo el cliente y servidor de mongo
+
 let mongoClient = new MongoClient(new MongoServer('localhost', 27017));
 let url = 'mongodb://localhost:27017';
 let dbName = 'myproject';
 let nombreColeccion = 'eventos';
 let collection = null;
 
+// Me conecto al conjunto de bases de datos
+
 mongoClient.connect((err, db) => {
 	if(err)
 		throw err;
 		
+	// Me conecto a la base de datos myproject -- si no existe la crea
+	
 	let dataBase = db.db(dbName);
+	
+	// Creamos la colección de la base de datos -- si ya existe no se hace nada
 	
 	dataBase.createCollection(nombreColeccion, (err, res) => {
 		if(err)
 			throw err;
 		
+		// Recojemos la referencia de la colección para tomarla fuera de la función
+		
 		collection = res;
+		
+		/*
+			Si ya existía la base de datos myproject elimino todo su contenido
+				la quiero nueva
+		*/
+		
 		res.deleteMany({}, (err, obj) => { });
 		
 		console.log("Collection created!");
 	});
 });
+
+/*
+	app es el middleware que tomará las peticiones de los métodos 
+	http (método .get por ejemplo) concreto	para las rutas concretas 
+	pasadas como primer parámetro ('/' por ejemplo)
+	
+	Los argumentos req y res es igual que sino utilizaramos express
+	
+	'/' ruta que devuelve la página index.html
+*/
 
 app.get('/', (req, res) => {
 	console.log("Se ha recibido una petición a /\n\n");
@@ -66,56 +114,121 @@ app.get('/', (req, res) => {
 	devolverIndex(req, res);
 });
 
+/*
+	'/actualizarEstado': Ruta que devuelve la página html para actualizar el estado
+	de la luminosidad y la temperatura (actualizarEstado.html)
+*/
+
 app.get('/actualizarEstado', (req, res) => {
 	console.log("Se ha recibido una petición a /actualizarEstado - get\n\n");
 	
 	devolverActualizarEstado(req, res);
 });
 
+/*
+	'/actualizarEstado' con el método POST: modifica la temperatura y la luminosidad
+	que tienen los objetos creados en el servidor y registra el evento en la colección
+	creada en mongoDB
+	
+	Los argumentos con el método POST se pueden acceder con res.body.<argumento>
+	
+	Se reciben luminosidad y temperatura
+*/
+
 app.post('/actualizarEstado', (req, res) => {
 	console.log("Se ha recibido una petición a /actualizarEstado - post\n\n");
 	console.log("Luminosidad: " + req.body.luminosidad);
 	console.log("Temperatura: " + req.body.temperatura);
 	
-	console.log("Luminosidad antes de modificarla: " + luminosidad.getEstado());
-	luminosidad.actualizarEstado(req.body.luminosidad);
-	console.log("Luminosidad después de modificarla: " + luminosidad.getEstado());
-	console.log("Temperatura antes de modificarla: " + temperatura.getEstado());
-	temperatura.actualizarEstado(req.body.temperatura);
-	console.log("Temperatura después de modificarla: " + temperatura.getEstado());
+	/*
+		Registramos la fecha en la base de datos de mongo con el formato:
+			<dia>-<mes>-<año>
+	*/
 	
 	let fecha = new Date();
 	let formatoFecha = fecha.getDay() + "-" + fecha.getMonth() + "-" + fecha.getFullYear();
 	
-	collection.insertOne({ evento: {
-			luminosidad: luminosidad.getEstado().toString(),
-			fecha: formatoFecha
-		}
-	});
+	/*
+		Si en el argumento de luminosidad se ha introducido algún valor
+			Actualizamos el estado del objeto luminosidad que tiene el servidor
+			Insertamos en la colección creada el evento ocasionado con el formato
+			
+				{
+					evento: {
+						luminosidad: x
+						fecha: y
+					}
+				}
+					
+	*/
 	
-	agente.realizarAcciones(luminosidad);
+	if(req.body.luminosidad != "") {
+		luminosidad.actualizarEstado(req.body.luminosidad);
 	
-	collection.insertOne({ evento: {
-		temperatura: temperatura.getEstado().toString(),
-		fecha: formatoFecha
-	}}, (err, res) => {
-		if(err)
-			throw err;
+		collection.insertOne({ evento: {
+				luminosidad: luminosidad.getEstado().toString(),
+				fecha: formatoFecha
+			}
+		});
 		
-		console.log("Insertada la tupla evento con éxito");
-	});
+		agente.realizarAcciones(luminosidad);
+	}
 	
-	agente.realizarAcciones(temperatura);
+	/*
+		Si en el argumento de la temperatura se ha introducido algún valor
+			Actualizamos el estado del objeto temperatura que tiene el servidor
+			Insertamos en la colección creada el evento ocasionado con el formato
+			
+				{
+					evento: {
+						temperatura: x
+						fecha: y
+					}
+				}
+	*/
 	
+	if(req.body.temperatura != "") {
+		temperatura.actualizarEstado(req.body.temperatura);
+	
+		collection.insertOne({ evento: {
+			temperatura: temperatura.getEstado().toString(),
+			fecha: formatoFecha
+		}}, (err, res) => {
+			if(err)
+				throw err;
+			
+			console.log("Insertada la tupla evento con éxito");
+		});
+		
+		agente.realizarAcciones(temperatura);
+	}
+	
+	/*
+		Se les notifica a todos los clientes que los valores de la luminosidad
+		y la temperatura han cambiado
+	*/
+	
+	let persianaAbierta = (motorPersiana.realizandoAccion()) ? "abierta" : "cerrada";
+	let aireEncendido = (aireAcondicionado.realizandoAccion()) ? "encendido" :
+		"apagado";
+		
+	console.log("Se recibe el mensaje de info");
+	io.emit('info', luminosidad.getEstado(), temperatura.getEstado(),
+		persianaAbierta, aireEncendido);
+		
 	devolverActualizarEstado(req, res);
 });
 
+/*
+	Ruta que devuelve todos los eventos registramos en el servidor de modificaciones
+	de temperaturas o luminosidad
+*/
+
 app.get('/getEventos', (req, res) => {
 	collection.find({}).toArray((err, docs) => {
-		let respuesta = "";
-		
-		respuesta = "<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head> \
-			<body>";
+		let respuesta = '<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head> \
+			<body><a href="./">Volver</a></br></br>';
+			
 		for(const tupla of docs) {
 			let valido = false;
 			let temperatura = tupla["evento"].temperatura;
@@ -139,19 +252,27 @@ app.get('/getEventos', (req, res) => {
 	});
 });
 
+/*
+	Modifica manualmente los valores de los actuadores
+*/
+
 app.post('/setActuadores', (req, res) => {
 	console.log("Se ha recibido una petición a /setActuadores - post\n\n");
 	console.log("Persiana: " + req.body.persiana);
 	console.log("Aire acondicionado: " + req.body.aireAcondicionado);
 	
 	let abierta = (req.body.persiana == "abierta") ? true : false;
-	let encendido = (req.body.aireAcondicionado = "encendido") ? true : false;
+	let encendido = (req.body.aireAcondicionado == "encendido") ? true : false;
 	
 	motorPersiana.setAccion(abierta);
 	aireAcondicionado.setAccion(encendido);
 	
 	devolverIndex(req, res);
 });
+
+/*
+	Ruta que devuelve cualquier fichero que se pide, esto se hace para los .css
+*/
 
 app.get('/*', (req, res) => {
 	console.log("Se ha recibido una petición a " + req.path + "\n\n");
@@ -162,6 +283,10 @@ app.get('/*', (req, res) => {
 		res.end(data);
 	});
 });
+
+/*
+	Abrimos el servidor en el puerto 8080
+*/
 
 http.listen(8080, () => {
 	console.log("Se ha iniciado el servidor en el puerto 8080\n\n");
@@ -188,16 +313,26 @@ agente.addAireAcondicionado(aireAcondicionado);
 
 /*
 	Creación de la comunicación con los WebSockets
+	
+	Cada vez que una persona se conecta se mira el valor de los actuadores
+	
+	Si se recibe un mensaje tipo 'infoActuadores'
+		Le devolvemos un mensaje del mismo pero con los argumentos de los valores
+		de la persiana y del aire acondicionado
+		
+	Si se recibe un mensaje tipo 'info'
+		Le devolvemos un mensaje del mismo tipo pero con los argumentos de los valores
+		de la luminosidad, temperatura, persiana y aire acondicionado
 */
 
 io.sockets.on('connection', (socket) => {
-	let abierta = (motorPersiana.realizandoAccion()) ? "abierta" : "cerrada";
-	let encendido = (aireAcondicionado.realizandoAccion()) ? "encendido" : "apagado";
-	
 	console.log("Se ha inscrito un nuevo cliente");
 	
 	socket.on('infoActuadores', () => {
-		socket.emit('infoActuadores', abierta, encendido);
+		let abierta = (motorPersiana.realizandoAccion()) ? "abierta" : "cerrada";
+		let encendido = (aireAcondicionado.realizandoAccion()) ? "encendido" : "apagado";
+		
+		io.emit('infoActuadores', abierta, encendido);
 	});
 	
 	socket.on('info', () => {
@@ -206,7 +341,7 @@ io.sockets.on('connection', (socket) => {
 			"apagado";
 			
 		console.log("Se recibe el mensaje de info");
-		socket.emit('info', luminosidad.getEstado(), temperatura.getEstado(),
+		io.emit('info', luminosidad.getEstado(), temperatura.getEstado(),
 			persianaAbierta, aireEncendido);
 	});
 });
