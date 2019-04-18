@@ -1,0 +1,45 @@
+.borde {
+	border-style: solid;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+#sensores {
+	margin-bottom: 3%;
+	margin-top: 2%;
+}
+
+h2 {
+	margin-left: 2%;
+	margin-top: 2%;
+}
+
+dl {
+	margin-left: 5%;
+}
+
+a:link, a:visited {
+	background-color: #f44336;
+	color: white;
+	padding: 0.3% 0.5%;
+	text-align: center;
+	display: inline-block;
+	text-decoration: none;
+}
+
+a:hover, a:active {
+	background-color: red;
+}
+
+.editar {
+	margin: 2%;
+}
+
+#setActuadores {
+	display: none;
+	margin-top: 2%;
+}
+
+#formulario {
+	margin: 1%;
+}

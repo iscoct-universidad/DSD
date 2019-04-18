@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Visualización de estados</title>
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="css/index.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta name="author" content="Francisco José Cotán López"/>
+	</head>
+	<body>
+		<div class="borde" id="sensores">
+			<h2>Sensores</h2>
+			<dl>
+				<dt>Luminosidad: </dt>
+				<dd id="luminosidad"></dd>
+				<dt>Temperatura: </dt>
+				<dd id="temperatura"></dd>
+			</dl>
+			<a class="editar" href="./actualizarEstado">Editar</a>
+		</div>
+		<div class="borde" id="actuadores">
+			<h2>Actuadores</h2>
+			<dl>
+				<dt>Persiana: </dt>
+				<dd id="persiana"></dd>
+				<dt>Aire acondicionado: </dt>
+				<dd id="aireAcondicionado"></dd>
+			</dl>
+			<button class="editar" onclick="mostrarSetActuadores()">Editar</button>
+			<a href="./getEventos">Ver todos los eventos que se han producido</a>
+		</div>
+		<div class="borde" id="setActuadores">
+			<form id="formulario" action="./setActuadores" method="post">
+				Persiana: <select name="persiana">
+					<option value="cerrada">Cerrada</option>
+					<option value="abierta">Abierta</option>
+				</select>
+				Aire acondicionado: <select name="aireAcondicionado">
+					<option value="apagado">Apagado</option>
+					<option value="encendido">Encendido</option>
+				</select>
+				<input type="submit" value="Enviar">
+			</form>
+		</div>
+		
+		<script src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript">
+			let socket = io();
+			
+			socket.emit('info');
+			socket.on('info', function(luminosidad, 
+					temperatura, persiana, aireAcondicionado) {
+				console.log("Se ha recibido un mensaje tipo info");
+				
+				document.getElementById("luminosidad").innerHTML = luminosidad;
+				document.getElementById("temperatura").innerHTML = temperatura;
+				document.getElementById("persiana").innerHTML = persiana;
+				document.getElementById("aireAcondicionado").innerHTML = aireAcondicionado;
+			});
+			
+			function mostrarSetActuadores() {
+				console.log("Aquí se entra correctamente");
+				document.getElementById("setActuadores").style.display = "block";
+			}
+		</script>
+	</body>
+</html>
